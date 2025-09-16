@@ -1,27 +1,65 @@
-name: CI Checks
+name: CI Checks (Expert)
 
 on:
   push:
-    branches: [ main ]
+    branches: [ main, expert-challenge ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, expert-challenge ]
 
 jobs:
-  build:
+  build-report:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: A simple build step
-        run: echo "Build step is just a placeholder..."
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      # <<< ERROR #1: Missing 'npm install' step here.
 
-  test:
+      - name: Generate Report
+        id: generate
+        run: node report-generator.js
+
+      - name: Upload Report Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-report
+          path: test-report.json
+
+  run-tests:
     runs-on: ubuntu-latest
-    needs: build
+    needs: build-report
+    strategy:
+      matrix:
+        # <<< ERROR #2: 'latest' is not a valid version for setup-node.
+        node-version: ['18', 'latest'] 
     steps:
       - uses: actions/checkout@v4
-      - name: Run unit tests
-          run: ./run-tests.sh
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
 
-      - name: Notify on success
-        if: success()
-        run: echo "Sending notification with token ${{ secrets.NOTIFICATION_TOKEN }}"
+      - name: Download Report Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: test-report
+      
+      - name: Validate Report
+        run: |
+          echo "Validating report using Node ${{ matrix.node-version }}..."
+          if [ -f "test-report.json" ]; then
+            echo "✅ Report found and validated."
+          else
+            echo "❌ Report not found!"
+            exit 1
+          fi
+
+  summarize-for-pr:
+    runs-on: ubuntu-latest
+    needs: run-tests
+    # <<< LOGIC TO TEST: This job should only run on pull requests.
+    if: github.event_name == 'pull_request'
+    steps:
+      - name: Print PR Summary
+        run: echo "This summary would be posted as a PR comment."

@@ -1,66 +1,55 @@
-# Warpshop Lab: Testing GitHub Actions Locally
+# Warpshop Lab: The Expert Challenge
 
-Welcome to the hands-on lab! Your mission is to use the `act` tool to find and fix the errors in this repository's GitHub Actions workflow, all without committing a single line of code.
-
-## Prerequisites
-
-Before you begin, please ensure you have the following installed and running:
-
-1.  **Docker Desktop:** Must be running in the background. ([Install Docker](https://www.docker.com/products/docker-desktop/))
-2.  **`act`:** The local runner tool. ([Install `act`](https://github.com/nektos/act#installation))
+Welcome to the expert challenge! You've mastered the basics, now let's tackle a more realistic and complex workflow. Your mission is to debug a multi-stage, matrix-driven CI pipeline using advanced `act` features.
 
 ---
 
-## Your 15-Minute Challenge
+## Your Expert Mission
 
-### Step 1: Clone This Repository
+The workflow on this branch is designed to build a report, test it across multiple Node.js versions, and then package the final results. It's currently broken in several ways.
 
-Open your terminal and clone this repository to your local machine:
+### Step 1: Fix the Build Artifacts
 
-```bash
-git clone https://github.com/your-username/warpshop-act-lab.git
-cd warpshop-act-lab
-```
+The first job, `build-report`, is supposed to create a report and upload it as an artifact for the next job to use. It's failing.
 
-### Step 2: The Main Goal (Fix the Syntax Error)
+1.  **Run the `build-report` job in isolation.** Use the `-j` flag to target only this job:
+    ```bash
+    act -j build-report
+    ```
+2.  **Observe the error.** The `Generate Report` step is failing because a dependency is missing.
+3.  **Fix the workflow.** Edit `.github/workflows/main.yml`. You need to add a step **before** the "Generate Report" step to install the Node.js dependencies. Use an `npm install` command.
+4.  **Verify your fix.** Run `act -j build-report` again. It should now succeed. Check your local file system: `act` creates an `artifacts` directory where the `test-report.json` file should now be located.
 
-The workflow in this repository is broken. Your first task is to find and fix the syntax error.
+### Step 2: Debug the Matrix Job
 
-1.  **Run `act` for the first time.** In your terminal, at the root of the project, simply run:
+The `run-tests` job uses a matrix strategy to test against multiple Node.js versions, but one of them is misconfigured.
 
+1.  **Run the `run-tests` job.** This job depends on the artifact from the first job. `act` handles this automatically.
+    ```bash
+    act -j run-tests
+    ```
+2.  **Observe the error.** The matrix will expand into two jobs. You'll see the job for Node.js 18 succeeds, but the job for Node.js "latest" fails with a strange error. It seems "latest" isn't a valid version for the `actions/setup-node` action.
+3.  **Fix the workflow.** In `main.yml`, change `node-version: ['18', 'latest']` to a valid LTS version, for example, `node-version: ['18', '20']`.
+4.  **Verify your fix.** Run `act -j run-tests` again. Both matrix jobs should now pass successfully.
+
+### Step 3: Simulate a Pull Request Event
+
+The final job, `summarize-for-pr`, should **only** run on a pull request, not on a push. Your final task is to verify this logic locally.
+
+1.  **Run `act` with the default `push` event.**
     ```bash
     act
     ```
+    Observe the output. You will see that the `summarize-for-pr` job is **skipped**. This is correct behavior!
 
-2.  **Observe the error.** You will see an immediate error message from `act` indicating that the workflow file (`.github/workflows/main.yml`) is invalid. It will likely point you to a specific line. This is the **instant feedback loop** in action!
-
-3.  **Fix the file.** Open `.github/workflows/main.yml` in your code editor. Find the error (hint: it's a common **YAML indentation mistake**) and correct it.
-
-4.  **Verify your fix.** Run `act` again.
-    *   **Expected Outcome:** The workflow will now start running! It will likely succeed on the `build` job but fail on the `test` job's "Notify" step. This is progress! You have fixed the syntax.
-
-### Step 3: The Bonus Challenge (Handle the Secret)
-
-The workflow is now failing because a step requires a secret that isn't available locally.
-
-1.  **Create a `.secrets` file.** In the root of the `warpshop-act-lab` directory, create a new file named `.secrets`.
-
-2.  **Add the secret to the file.** Add the following line to your new `.secrets` file and save it:
-
-    ```
-    NOTIFICATION_TOKEN=this-is-my-local-secret-for-testing
-    ```
-
-3.  **Run `act` with the secrets file.** Now, tell `act` to use your secrets file with the `--secret-file` flag:
-
+2.  **Simulate a `pull_request` event.** Now, tell `act` to run the workflow as if it were triggered by a pull request.
     ```bash
-    act --secret-file .secrets
+    act pull_request
     ```
-
-4.  **Observe the success!** You should now see all jobs complete successfully in your terminal. The "Notify" step will print the secret you provided.
+3.  **Verify the outcome.** This time, the `summarize-for-pr` job should run and succeed, printing a summary message.
 
 ---
 
-## Congratulations!
+## Mission Accomplished, Expert!
 
-You have successfully debugged a GitHub Actions workflow entirely on your local machine. You've fixed a syntax error and handled secrets, all without a single "fix ci" commit. You're no longer pushing and praying!
+You've successfully debugged a complex CI pipeline involving job dependencies, artifacts, matrix strategies, and event-based logic—all without a single commit. You are now an `act` power user!
