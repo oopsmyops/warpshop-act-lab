@@ -1,0 +1,27 @@
+name: CI Checks
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: A simple build step
+        run: echo "Build step is just a placeholder..."
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run unit tests
+        run: ./run-tests.sh
+
+      - name: Notify on success
+        if: success()
+        run: echo "Sending notification with token ${{ secrets.NOTIFICATION_TOKEN }}"
