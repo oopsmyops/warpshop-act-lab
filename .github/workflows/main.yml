@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run unit tests
-        run: ./run-tests.sh
+          run: ./run-tests.sh
 
       - name: Notify on success
         if: success()
