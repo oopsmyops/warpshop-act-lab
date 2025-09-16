@@ -1,0 +1,14 @@
+{
+  "name": "warpshop-act-lab",
+  "version": "1.0.0",
+  "description": "Lab files for the act Warpshop",
+  "main": "report-generator.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "uuid": "^9.0.1"
+  }
+}
