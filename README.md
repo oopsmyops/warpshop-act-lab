@@ -14,7 +14,7 @@ The first job, `build-report`, is supposed to create a report and upload it as a
 
 **Run the `build-report` job in isolation.** Use the `-j` flag to target only this job:
     ```bash
-    act -j build-report --artifact-server-path /tmp/artifacts
+    act -j build-report
     ```
 
 ### Step 2: Debug the Matrix Job
@@ -23,7 +23,7 @@ The `run-tests` job uses a matrix strategy to test against multiple Node.js vers
 
 **Run the `run-tests` job.** This job depends on the artifact from the first job. `act` handles this automatically.
     ```bash
-    act -j run-tests --artifact-server-path /tmp/artifacts
+    act -j run-tests
     ```
 
 ### Step 3: Simulate a Pull Request Event
@@ -32,7 +32,7 @@ The final job, `summarize-for-pr`, should **only** run on a pull request, not on
 
 1.  **Run `act` with the default `push` event.**
     ```bash
-    act --artifact-server-path /tmp/artifacts
+    act
     ```
     Observe the output. You will see that the `summarize-for-pr` job is **skipped**. Try simulating a `pull_request` event.
 
