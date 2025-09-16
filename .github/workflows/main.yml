@@ -2,9 +2,9 @@ name: CI Checks (Expert)
 
 on:
   push:
-    branches: [ main, expert-challenge ]
+    branches: [ main, expert-challenge, demo ]
   pull_request:
-    branches: [ main, expert-challenge ]
+    branches: [ main, expert-challenge, demo ]
 
 jobs:
   build-report:
