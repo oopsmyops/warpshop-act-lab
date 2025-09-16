@@ -14,8 +14,6 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      
-      # <<< ERROR #1: Missing 'npm install' step here.
 
       - name: Generate Report
         id: generate
@@ -32,8 +30,7 @@ jobs:
     needs: build-report
     strategy:
       matrix:
-        # <<< ERROR #2: 'latest' is not a valid version for setup-node.
-        node-version: ['18', 'latest'] 
+        node-version: ['18.20.8', '20.21.5'] 
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -58,7 +55,6 @@ jobs:
   summarize-for-pr:
     runs-on: ubuntu-latest
     needs: run-tests
-    # <<< LOGIC TO TEST: This job should only run on pull requests.
     if: github.event_name == 'pull_request'
     steps:
       - name: Print PR Summary
