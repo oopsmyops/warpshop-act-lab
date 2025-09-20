@@ -6,8 +6,8 @@ Welcome to the hands-on lab! Your mission is to use the `act` tool to find and f
 
 Before you begin, please ensure you have the following installed and running:
 
-1.  **Docker Desktop:** Must be running in the background. ([Install Docker](https://www.docker.com/products/docker-desktop/))
-2.  **`act`:** The local runner tool. ([Install `act`](https://github.com/nektos/act#installation))
+1.  **Docker Desktop:** Must be running in the background. ([Install Docker](https://www.docker.com/products/docker-desktop/)) or **Docker Engine**: [Docker Engine](https://docs.docker.com/engine/install/ubuntu/)
+2.  **`act`:** The local runner tool. ([Install `act`](https://nektosact.com/installation/))
 
 ---
 

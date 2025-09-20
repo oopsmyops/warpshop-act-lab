@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: A simple build step
-        run: echo "Build step is just a placeholder..."
+          run: echo "Build step is just a placeholder..."
 
   test:
     runs-on: ubuntu-latest
@@ -20,8 +20,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Run unit tests
-          run: ./run-tests.sh
+        run: ./run-tests.sh
 
       - name: Notify on success
         if: success()
-        run: echo "Sending notification with token ${{ secrets.NOTIFICATION_TOKEN }}"
+        run: |
+          if [ -z "${{ secrets.NOTIFICATION_TOKEN }}" ]; then
+          echo "NOTIFICATION_TOKEN secret is missing"
+          exit 1
+          fi
+          echo "Sending notification with token ${{ secrets.NOTIFICATION_TOKEN }}"
